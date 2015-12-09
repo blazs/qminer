@@ -14,6 +14,7 @@
 
 #include <node.h>
 #include <node_object_wrap.h>
+#include <node_buffer.h>
 #include <uv.h>
 #include "base.h"
 

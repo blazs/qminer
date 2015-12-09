@@ -702,10 +702,14 @@ PMem TNodeJsUtil::GetArgMem(const v8::FunctionCallbackInfo<v8::Value>& Args, con
 	v8::Isolate* Isolate = v8::Isolate::GetCurrent();
 	v8::HandleScope HandleScope(Isolate);
 	v8::Local<v8::Object> Obj = Args[0]->ToObject();
-	v8::ExternalArrayType ExternalType = Obj->GetIndexedPropertiesExternalArrayDataType();
-	if (ExternalType != v8::ExternalArrayType::kExternalUint8Array) return TMem::New();
-	int Len = Obj->GetIndexedPropertiesExternalArrayDataLength();
-	return TMem::New(static_cast<char*>(Obj->GetIndexedPropertiesExternalArrayData()), Len);
+	// XXX As of Node v5.x.x the following two lines no longer go through
+	// v8::ExternalArrayType ExternalType = Obj->GetIndexedPropertiesExternalArrayDataType();
+	// if (ExternalType != v8::ExternalArrayType::kExternalUint8Array) return TMem::New();
+	if (!Obj->IsUint8Array()) return TMem::New();
+	// XXX As of Node v5.x.x the following two lines no longer go through
+	// int Len = Obj->GetIndexedPropertiesExternalArrayDataLength();
+	// return TMem::New(static_cast<char*>(Obj->GetIndexedPropertiesExternalArrayData()), Len);
+	return TMem::New(node::Buffer::Data(Obj), node::Buffer::Length(Obj));
 }
 
 uint64 TNodeJsUtil::GetTmMSecs(v8::Handle<v8::Date>& Date) {
